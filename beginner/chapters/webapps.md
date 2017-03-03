@@ -268,12 +268,12 @@ A [Dockerfile](https://docs.docker.com/engine/reference/builder/) is a text file
   We'll start by specifying our base image, using the `FROM` keyword:
 
   ```
-  FROM alpine:latest
+  FROM alpine:3.5
   ```
 
 2. The next step usually is to write the commands of copying the files and installing the dependencies. But first we will install the Python pip package to the alpine linux distribution. This will not just install the pip package but any other dependencies too, which includes the python interpreter. Add the following [RUN](https://docs.docker.com/engine/reference/builder/#run) command next:
   ```
-  RUN apk add --update py-pip
+  RUN apk add --update py2-pip
   ```
 
 3. Let's add the files that make up the Flask Application.
@@ -311,10 +311,10 @@ A [Dockerfile](https://docs.docker.com/engine/reference/builder/) is a text file
 
   ```
   # our base image
-  FROM alpine:latest
+  FROM alpine:3.5
 
   # Install python and pip
-  RUN apk add --update py-pip
+  RUN apk add --update py2-pip
 
   # install Python modules needed by the Python app
   COPY requirements.txt /usr/src/app/
@@ -405,10 +405,10 @@ Removing intermediate container 78e324d26576
 Successfully built 2f7357a0805d
 ```
 
-If you don't have the `alpine:latest` image, the client will first pull the image and then create your image. Therefore, your output on running the command will look different from mine. If everything went well, your image should be ready! Run `docker images` and see if your image (`<YOUR_USERNAME>/myfirstapp`) shows.
+If you don't have the `alpine:3.5` image, the client will first pull the image and then create your image. Therefore, your output on running the command will look different from mine. If everything went well, your image should be ready! Run `docker images` and see if your image (`<YOUR_USERNAME>/myfirstapp`) shows.
 
 ### 2.3.4 Run your image
-The last step in this section is to run the image and see if it actually works.
+The next step in this section is to run the image and see if it actually works.
 
 ```
 $ docker run -p 8888:5000 --name myfirstapp YOUR_USERNAME/myfirstapp
@@ -421,7 +421,13 @@ Head over to `http://localhost:8888` and your app should be live. **Note** If yo
 
 Hit the Refresh button in the web browser to see a few more cat images.
 
-OK, now that you are done with this container, stop and remove it since you won't be using it again.
+### 2.3.4 Push your image
+Now that you've created and tested your image, you can push it to [Docker Hub](https://hub.docker.com). All you have to do is:
+
+```
+docker push YOUR_USERNAME/myfirstapp
+```
+Now that you are done with this container, stop and remove it since you won't be using it again.
 
 Open another terminal window and execute the following commands:
 
@@ -453,7 +459,13 @@ Here's a quick summary of the few basic commands we used in our Dockerfile.
   CMD ["/bin/bash", "echo", "Hello World"]
 ```
 
-* `EXPOSE` opens ports in your image to allow communication to the outside world when it runs in a container.
+* `EXPOSE` creates a hint for users of an image which ports provide services. It is included in the information which
+ can be retrieved via `$ docker inspect <container-id>`.     
+
+>**Note:** The `EXPOSE` command does not actually make any ports accessible to the host! Instead, this requires 
+publishing ports by means of the `-p` flag when using `$ docker run`.  
+
+* `PUSH` pushes your image to Docker Hub, or alternately to a [private registry](TODO: add URL)
 
 >**Note:** If you want to learn more about Dockerfiles, check out [Best practices for writing Dockerfiles](https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/).
 
